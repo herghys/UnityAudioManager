@@ -58,8 +58,10 @@ namespace Herghys.SimpleAudioManager
                 sound.Source = source;
             }
         }
+
+        #region Non Looping Sound
         /// <summary>
-        /// Play Sound, cascading to other sounds
+        /// Play sound by name, cascading to other sounds
         /// </summary>
         /// <param name="name">Audio name</param>
         public void PlaySound(string name)
@@ -73,13 +75,42 @@ namespace Herghys.SimpleAudioManager
         }
 
         /// <summary>
-        /// Play one sound, stop other playing sounds
+        /// Play sound by sound index, cascading to other sounds
+        /// </summary>
+        /// <param name="index">Audio index</param>
+        public void PlaySound(int index)
+        {
+            AudioData sound = GetSound(index);
+            if (sound != null)
+            {
+                sound.Play();
+                sound.Played = true;
+            }
+        }
+
+        /// <summary>
+        /// Play sound by name, stop other playing sounds
         /// </summary>
         /// <param name="name">Audio name</param>
         public void PlayOneSound(string name)
         {
             StopAll();
             AudioData sound = GetSound(name);
+            if (sound != null)
+            {
+                sound.Play();
+                sound.Played = true;
+            }
+        }
+
+        /// <summary>
+        /// Play sound by index, stop other playing sounds
+        /// </summary>
+        /// <param name="name">Audio index</param>
+        public void PlayOneSound(int index)
+        {
+            StopAll();
+            AudioData sound = GetSound(index);
             if (sound != null)
             {
                 sound.Play();
@@ -102,6 +133,20 @@ namespace Herghys.SimpleAudioManager
         }
 
         /// <summary>
+        /// Stop sound by index
+        /// </summary>
+        /// <param name="index">Audio index</param>
+        public void StopSound(int index)
+        {
+            AudioData sound = GetSound(index);
+            if (sound != null)
+            {
+                sound.Stop();
+                sound.Played = false;
+            }
+        }
+
+        /// <summary>
         /// Stop All playing Sounds
         /// </summary>
         public void StopAll()
@@ -111,7 +156,9 @@ namespace Herghys.SimpleAudioManager
                 sound.Stop();
             }
         }
+        #endregion
 
+        #region Audio Loop
         /// <summary>
         /// Play looping audio
         /// </summary>
@@ -129,19 +176,63 @@ namespace Herghys.SimpleAudioManager
         }
 
         /// <summary>
-        /// Stop Audio Loop
+        /// Play looping audio by index
+        /// </summary>
+        /// <param name="index">Audio index</param>
+        public void PlayLoop(int index)
+        {
+            AudioData sound = GetSound(index);
+            if (sound != null)
+            {
+                sound.Loop = true;
+                sound.Play();
+                sound.Played = true;
+            }
+        }
+
+        /// <summary>
+        /// Stop looping audio by name
         /// </summary>
         /// <param name="name">Audio name</param>
         public void StopLoop(string name)
         {
             AudioData sound = GetSound(name);
-            if(sound != null) sound.Loop = false;
+            if (sound != null) sound.Loop = false;
         }
+
+        /// <summary>
+        /// Stop looping audio by index
+        /// </summary>
+        /// <param name="index">Audio index</param>
+        public void StopLoop(int index)
+        {
+            AudioData sound = GetSound(index);
+            if (sound != null) sound.Loop = false;
+        }
+
+        /// <summary>
+        /// Stop all audio also stop the loops
+        /// </summary>
+        public void StopAllLoop()
+        {
+            foreach (var sound in sounds)
+            {
+                sound.Stop();
+                sound.Loop = false;
+            }
+        }
+        #endregion
         #endregion
 
         #region Getters
         public bool PlayStartUp { get => playStartUp; }
         public bool PersistAcroosScenes { get => persistAcrossScenes; }
+
+        /// <summary>
+        /// Get sound by name
+        /// </summary>
+        /// <param name="name">Audio name</param>
+        /// <returns></returns>
         AudioData GetSound(string name)
         {
             foreach (AudioData sound in sounds)
@@ -153,6 +244,13 @@ namespace Herghys.SimpleAudioManager
             }
             return null;
         }
+
+        /// <summary>
+        /// Get sound by index
+        /// </summary>
+        /// <param name="index">Audio index</param>
+        /// <returns></returns>
+        AudioData GetSound(int index) => sounds[index];
         #endregion
     }
 }

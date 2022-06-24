@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioName: 2
   clip: {fileID: 8300000, guid: a13c8753c7572b24dbf8f343b4f52c05, type: 3}
-  isPlayed: 0
   Source: {fileID: 0}
   Volume: 1
   Pitch: 1

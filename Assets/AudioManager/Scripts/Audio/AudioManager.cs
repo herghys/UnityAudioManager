@@ -1,19 +1,24 @@
-using System.Collections;
 using UnityEngine;
 
-namespace Audio
+namespace Herghys.SimpleAudioManager
 {
     public class AudioManager : MonoBehaviour
     {
         #region Variables
-        public bool playStartUp;
-        public static bool isMuted;
-        public static AudioManager Instance = null;
+        [Tooltip("Play StartUp Sound")]
+        [SerializeField] bool playStartUp;
+
+        [Tooltip("Persist audio manager across scenes, trigger don't Don't Destroy On Load")]
+        [SerializeField] bool persistAcrossScenes;
+
+        [Tooltip("StartUp track to play")]
+        [SerializeField] string startUpTrack = string.Empty;
 
         [SerializeField] AudioData[] sounds = null;
         [SerializeField] AudioSource sourcePrefab = null;
 
-        [SerializeField] string startUpTrack = string.Empty;
+        public static bool isMuted;
+        public static AudioManager Instance = null;
         #endregion
         private void Awake()
         {
@@ -22,8 +27,12 @@ namespace Audio
             else
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
+
+                if (persistAcrossScenes)
+                    DontDestroyOnLoad(gameObject);
             }
+
+
             InitSounds();
         }
 
@@ -49,7 +58,10 @@ namespace Audio
                 sound.Source = source;
             }
         }
-
+        /// <summary>
+        /// Play Sound, cascading to other sounds
+        /// </summary>
+        /// <param name="name">Audio name</param>
         public void PlaySound(string name)
         {
             AudioData sound = GetSound(name);
@@ -60,6 +72,25 @@ namespace Audio
             }
         }
 
+        /// <summary>
+        /// Play one sound, stop other playing sounds
+        /// </summary>
+        /// <param name="name">Audio name</param>
+        public void PlayOneSound(string name)
+        {
+            StopAll();
+            AudioData sound = GetSound(name);
+            if (sound != null)
+            {
+                sound.Play();
+                sound.Played = true;
+            }
+        }
+
+        /// <summary>
+        /// Stop sound by name
+        /// </summary>
+        /// <param name="name">Audio name</param>
         public void StopSound(string name)
         {
             AudioData sound = GetSound(name);
@@ -70,6 +101,21 @@ namespace Audio
             }
         }
 
+        /// <summary>
+        /// Stop All playing Sounds
+        /// </summary>
+        public void StopAll()
+        {
+            foreach (var sound in sounds)
+            {
+                sound.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Play looping audio
+        /// </summary>
+        /// <param name="name">Audio name</param>
         public void PlayLoop(string name)
         {
             AudioData sound = GetSound(name);
@@ -82,77 +128,20 @@ namespace Audio
             }
         }
 
+        /// <summary>
+        /// Stop Audio Loop
+        /// </summary>
+        /// <param name="name">Audio name</param>
         public void StopLoop(string name)
         {
             AudioData sound = GetSound(name);
             if(sound != null) sound.Loop = false;
         }
-        
-        public void StopAll()
-        {
-            foreach (var sound in sounds)
-            {
-                sound.Stop();
-            }
-        }
-
-        /*public void ToggleMusic(string name, bool paused)
-        {
-            AudioData sound = GetSound(name);
-            if (sound != null)
-            {
-                if (paused == false)
-                {
-
-                    StartCoroutine(SoundPause(name, paused, 0.4f));
-                }
-                else
-                {
-                    StartCoroutine(SoundPause(name, paused, 0));
-                    StopSound(name);
-                }
-            }
-        }*/
-
-        /*IEnumerator SoundPause(string name, bool paused, float targetSound)
-        {
-            AudioData sound = GetSound(name);
-            if (paused && sound != null)
-            {
-                float time = 1f;
-                while (time > targetSound)
-                {
-                    time -= Time.deltaTime;
-                    sound.Source.volume = time;
-                    yield return 0;
-                }
-
-            }
-            else if (!paused && sound != null)
-            {
-                float time = 0f;
-                while (time < targetSound)
-                {
-                    time += Time.deltaTime;
-                    sound.Source.volume = time;
-                    yield return 0;
-                }
-            }
-
-        }*/
         #endregion
 
         #region Getters
-        /*public bool GetMusicState(string name)
-        {
-            AudioData sound = GetSound(name);
-            if (sound != null)
-            {
-                return sound.Played;
-            }
-            return sound.Played;
-        }*/
-
+        public bool PlayStartUp { get => playStartUp; }
+        public bool PersistAcroosScenes { get => persistAcrossScenes; }
         AudioData GetSound(string name)
         {
             foreach (AudioData sound in sounds)

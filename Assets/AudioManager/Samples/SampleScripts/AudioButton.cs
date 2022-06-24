@@ -1,5 +1,5 @@
 using UnityEngine;
-using Audio;
+using Herghys.SimpleAudioManager;
 
 public class AudioButton : MonoBehaviour
 {
